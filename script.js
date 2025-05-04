@@ -101,26 +101,21 @@ document.addEventListener('DOMContentLoaded', () => {
       const difficultyConfig = config.difficulties[state.currentDifficulty];
       state.seconds = difficultyConfig.time;
 
-      // 1. Prepare images
       prepareCardImages(difficultyConfig.pairs);
 
-      // 2. Setup grid style
       setupGrid(difficultyConfig.cols, difficultyConfig.cardSize);
 
-      // 3. Create cards
-      elements.containers.game.innerHTML = ''; // Clear previous grid
+      elements.containers.game.innerHTML = '';
       state.cardImages.forEach(imageSrc => {
           const card = createCardElement(imageSrc);
           elements.containers.game.appendChild(card);
       });
       state.cards = elements.containers.game.querySelectorAll(config.selectors.card);
 
-      // 4. Update UI displays
       updateMovesDisplay();
       updateScoreDisplay();
-      updateTimerDisplay(); // Show initial time
+      updateTimerDisplay();
 
-      // 5. Switch to game view and start
       switchView('game');
       state.gameActive = true;
       startTimer();
@@ -138,38 +133,34 @@ document.addEventListener('DOMContentLoaded', () => {
       state.timerInterval = null;
       state.seconds = 0;
       state.gameActive = false;
-      // Don't reset currentDifficulty here
   }
 
   function prepareCardImages(pairCount) {
       const availableImages = [...config.baseImages];
       if (availableImages.length < pairCount) {
           console.error(`Error: Need ${pairCount} unique images, but only ${availableImages.length} provided in config.baseImages.`);
-           // You might want to gracefully handle this, e.g., repeat images or throw error
-          return; // Stop game setup if not enough images
+          return; 
       }
 
       shuffleArray(availableImages);
       const selectedPairs = availableImages.slice(0, pairCount);
-      state.cardImages = [...selectedPairs, ...selectedPairs]; // Duplicate for pairs
-      shuffleArray(state.cardImages); // Shuffle the final pairs
+      state.cardImages = [...selectedPairs, ...selectedPairs];
+      shuffleArray(state.cardImages);
   }
 
   function shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
-          [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+          [array[i], array[j]] = [array[j], array[i]];
       }
   }
 
   function setupGrid(columns, cardSizePx) {
       const container = elements.containers.game;
-      container.style.gridTemplateColumns = `repeat(${columns}, 1fr)`; // Use fractional units
+      container.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
 
-      // Set the CSS variable for card size
       document.documentElement.style.setProperty('--card-size', `${cardSizePx}px`);
 
-      // Adjust gap slightly based on card size (optional)
       const gap = Math.max(5, Math.min(10, Math.floor(cardSizePx / 10)));
       document.documentElement.style.setProperty('--grid-gap', `${gap}px`);
   }
@@ -177,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function createCardElement(imageSrc) {
       const card = document.createElement('div');
       card.classList.add('card');
-      card.dataset.image = imageSrc; // Store image identifier
+      card.dataset.image = imageSrc; 
 
       card.innerHTML = `
           <div class="card-face card-front"></div>
@@ -185,7 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
               <img src="${imageSrc}" alt="Card Image" draggable="false">
           </div>
       `;
-      // Set the correct initial card back image from settings
       const frontFace = card.querySelector('.card-front');
       if(frontFace) {
            frontFace.style.backgroundImage = getComputedStyle(document.documentElement).getPropertyValue('--card-back-image');
@@ -196,7 +186,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function handleCardClick() {
-      // Guard clauses: If board locked, game inactive, card already flipped/matched, or it's the same card clicked twice
       if (state.lockBoard || !state.gameActive || this.classList.contains(config.selectors.flipped.substring(1)) || this.classList.contains(config.selectors.matched.substring(1)) || this === state.firstCard) {
           return;
       }
@@ -205,12 +194,12 @@ document.addEventListener('DOMContentLoaded', () => {
       this.classList.add(config.selectors.flipped.substring(1));
 
       if (!state.firstCard) {
-          state.firstCard = this; // First card flipped
+          state.firstCard = this;
       } else {
-          state.secondCard = this; // Second card flipped
+          state.secondCard = this; 
           state.moves++;
           updateMovesDisplay();
-          state.lockBoard = true; // Lock board while checking
+          state.lockBoard = true;
           checkForMatch();
       }
   }
@@ -221,13 +210,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (isMatch) {
           playSound(elements.audio.match);
           state.matches++;
-          state.score += 10; // Basic scoring
+          state.score += 10;
           updateScoreDisplay();
-          // Delay marking as matched for visual feedback
           setTimeout(() => {
               disableMatchedCards();
                if (state.matches === state.cardImages.length / 2) {
-                  endGame(true); // Game Won
+                  endGame(true); 
               } else {
                   resetTurn(); 
               }
@@ -238,11 +226,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function disableMatchedCards() {
-      state.firstCard.classList.remove(config.selectors.flipped.substring(1)); // Ensure flip class is removed if animation incomplete
+      state.firstCard.classList.remove(config.selectors.flipped.substring(1));
       state.secondCard.classList.remove(config.selectors.flipped.substring(1));
       state.firstCard.classList.add(config.selectors.matched.substring(1));
       state.secondCard.classList.add(config.selectors.matched.substring(1));
-      // Optionally remove click listener, though pointer-events:none in CSS handles it
   }
 
   function unflipCards() {
@@ -261,23 +248,22 @@ document.addEventListener('DOMContentLoaded', () => {
       clearInterval(state.timerInterval);
       updateTimerDisplay();
       state.timerInterval = setInterval(() => {
-          if (!state.gameActive) return; // Stop if game ended elsewhere
+          if (!state.gameActive) return;
           state.seconds--;
           updateTimerDisplay();
           if (state.seconds <= 0) {
-              endGame(false); // Game Lost (Time's up)
+              endGame(false); 
           }
       }, 1000);
   }
 
   function endGame(isWin) {
       state.gameActive = false;
-      state.lockBoard = true; // Ensure board stays locked
+      state.lockBoard = true; 
       clearInterval(state.timerInterval);
 
       saveScoreToLeaderboard();
 
-      // Add small delay before showing modal
       setTimeout(() => {
           if (isWin && typeof confetti === 'function') {
               playSound(elements.audio.win);
@@ -287,7 +273,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 500);
   }
 
-  // --- UI Update Functions ---
   function updateScoreDisplay() {
       elements.displays.score.textContent = `Score: ${state.score}`;
   }
@@ -298,7 +283,6 @@ document.addEventListener('DOMContentLoaded', () => {
       elements.displays.timer.textContent = `Time: ${state.seconds}s`;
   }
 
-  // --- Audio ---
   function playSound(audioElement) {
        if (!state.audioMuted && audioElement) {
           audioElement.currentTime = 0; // Rewind
