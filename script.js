@@ -356,14 +356,12 @@ document.addEventListener('DOMContentLoaded', () => {
    }
 
   function loadSettings() {
-       // Load Music
-      const savedMusic = localStorage.getItem(config.storageKeys.music) || ''; // Default to none selected
+      const savedMusic = localStorage.getItem(config.storageKeys.music) || '';
        if (savedMusic) {
            elements.inputs.musicSelect.value = savedMusic;
           handleMusicSelection(); // Apply setting
        }
 
-      // Load Card Back
        const savedCardBack = localStorage.getItem(config.storageKeys.cardBack);
       if (savedCardBack) {
           elements.inputs.cardBackSelect.value = savedCardBack;
