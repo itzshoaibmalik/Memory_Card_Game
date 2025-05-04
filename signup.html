@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Memory Game</title>
+    <link rel="stylesheet" href="auth_style.css"> 
+</head>
+<body>
+    <div class="auth-container">
+        <h1>Sign Up</h1>
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required>
+             </div>
+            <div class="form-group">
+                <label for="new-username">Choose Username</label>
+                <input type="text" id="new-username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="new-password">Create Password</label>
+                <input type="password" id="new-password" name="password" required>
+            </div>
+             <div class="form-group">
+                <label for="confirm-password">Confirm Password</label>
+                <input type="password" id="confirm-password" name="confirm_password" required>
+            </div>
+            <button type="submit" class="submit-btn">Create Account</button>
+        </form>
+        <p class="auth-link">Already have an account? <a href="login.html">Login</a></p>
+         <p class="auth-link"><a href="index.html">Back to Game</a></p>
+    </div>
+    <script>
+         document.getElementById('signupForm').addEventListener('submit', function(e) {
+             e.preventDefault();
+             const pass = document.getElementById('new-password').value;
+             const confirmPass = document.getElementById('confirm-password').value;
+             if (pass !== confirmPass) {
+                 alert('Passwords do not match!');
+                 return;
+             }
+             alert('Sign up functionality not implemented in this demo!');
+        });
+    </script>
+</body>
+</html>
