@@ -285,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function playSound(audioElement) {
        if (!state.audioMuted && audioElement) {
-          audioElement.currentTime = 0; // Rewind
+          audioElement.currentTime = 0;
            audioElement.play().catch(error => console.error("Audio playback error:", error));
        }
   }
@@ -296,13 +296,11 @@ document.addEventListener('DOMContentLoaded', () => {
        if (state.audioMuted) {
           elements.audio.background.pause();
        } else {
-          // Only play if a source is set and it's not the 'disabled' option
            const selectedMusic = elements.inputs.musicSelect.value;
           if (selectedMusic && selectedMusic !== 'disabled' && elements.audio.background.src) {
               elements.audio.background.play().catch(e => console.error("Audio play error:", e));
           }
        }
-       // Could also save mute preference to localStorage
    }
 
    function handleMusicSelection() {
@@ -311,19 +309,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (selectedMusic && selectedMusic !== 'disabled') {
           elements.audio.background.src = selectedMusic;
-          // Don't automatically play here, respect the muted state
           if (!state.audioMuted) {
               elements.audio.background.play().catch(e => console.error("Audio play error:", e));
           }
           if (state.audioMuted && elements.buttons.toggleAudio.textContent === '🔊') {
-               // If muted icon shows sound ON but no track selected, change to MUTE
                elements.buttons.toggleAudio.textContent = '🔇';
           }
        } else {
            elements.audio.background.pause();
           elements.audio.background.removeAttribute('src'); // Clear source
           if (elements.buttons.toggleAudio.textContent === '🔊') {
-               // Change icon to muted if music turned off via selection
                elements.buttons.toggleAudio.textContent = '🔇';
                state.audioMuted = true;
           }
@@ -331,7 +326,6 @@ document.addEventListener('DOMContentLoaded', () => {
    }
 
 
-  // --- Settings Panel ---
   function toggleSettingsPanel() {
       const isOpen = elements.other.settingsPanel.classList.contains('open');
       if (isOpen) {
