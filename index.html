@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Card Game</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+
+<body>
+    <video autoplay muted loop class="video-background">
+        <source src="bgvideo1.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <audio id="clickSound" src="music/sound1.mp3" preload="auto"></audio>
+    <audio id="matchSound" src="music/match.mp3" preload="auto"></audio> <!-- Add this sound -->
+    <audio id="winSound" src="music/win.mp3" preload="auto"></audio> <!-- Add this sound -->
+    <audio id="backgroundAudio" loop preload="auto"></audio> <!-- Src set by JS -->
+
+    <div class="container">
+        <header class="game-header">
+            <button id="toggleButton" title="Toggle Music">🔊</button>
+            <h1 id="game-title">MEMORY GAME</h1>
+            <button id="settingsButton" title="Settings">⚙️</button>
+        </header>
+
+        <div id="view-difficulty" class="view active">
+            <h2>Choose Difficulty</h2>
+            <div class="difficulty-buttons">
+                <button data-difficulty="easy">Easy (4x4)</button>
+                <button data-difficulty="medium">Medium (5x4)</button>
+                <button data-difficulty="hard">Hard (6x5)</button>
+            </div>
+        </div>
+
+        <div id="view-game" class="view">
+            <div class="status-bar">
+                <div id="score" class="status-item">Score: 0</div>
+                <div id="moves" class="status-item">Moves: 0</div>
+                <div id="timer" class="status-item">Time: 0s</div>
+            </div>
+            <div class="game-container-wrapper">
+                <div class="game-container" id="game-container">
+                </div>
+            </div>
+            <div class="footer-buttons">
+                <button id="restart-button">⟳ Restart</button>
+                <button id="menu-button">🏠︎ Menu</button>
+            </div>
+        </div>
+
+        <aside class="settings-panel" id="settingsPanel">
+            <button class="close-settings-btn" id="closeSettingsBtn" title="Close Settings">×</button>
+            <h3>Settings</h3>
+
+            <div class="settings-section">
+                <label for="musicSelect">Background Music:</label>
+                <select id="musicSelect">
+                    <option value="">-- Select Music --</option>
+                    <option value="music/houseofdragons.mp3">Epic Theme 1</option>
+                    <option value="music/music2.mp3">Calm Focus</option>
+                    <option value="music/music3.mp3">Upbeat Synth</option>
+                    <option value="disabled">No Music</option>
+                </select>
+            </div>
+
+            <div class="settings-section">
+                <label for="cardBackSelect">Card Back:</label>
+                <select id="cardBackSelect">
+                    <option value="img/imagebg.jpg">Default Pattern</option>
+
+
+
+                </select>
+            </div>
+
+            <div class="settings-section profile-section">
+                <img src="img/profile1.jpeg" alt="Profile" class="profile-img">
+                <button class="btn-secondary">Login</button>
+                <button class="btn-secondary">Sign Up</button>
+            </div>
+
+        </aside>
+        <div class="overlay" id="overlay"></div> <!-- For dimming background -->
+
+        <div id="gameOverModal" class="modal">
+            <div class="modal-content">
+                <button class="close-modal-btn" onclick="closeModal()">×</button> <!-- Simple close -->
+                <h2 id="modalTitle">Game Over!</h2>
+                <div class="modal-stats">
+                    <p id="modalScore">Score: 0</p>
+                    <p id="modalTime">Time Left: 0s</p>
+                    <p id="modalMoves">Moves: 0</p>
+                </div>
+                <hr>
+                <div id="leaderboardContainer">
+                    <h3>Leaderboard</h3>
+                    <div id="leaderboard"></div>
+                </div>
+                <hr>
+                <div class="modal-buttons">
+                    <button id="modalRestartBtn">Play Again</button>
+                    <button id="modalMenuBtn">Main Menu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
