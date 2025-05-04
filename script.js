@@ -367,26 +367,23 @@ document.addEventListener('DOMContentLoaded', () => {
           elements.inputs.cardBackSelect.value = savedCardBack;
           handleCardBackSelection();
       } else {
-          // Set default from CSS variable if nothing saved
           handleCardBackSelection();
        }
   }
 
 
-  // --- Modal & Leaderboard ---
   function showModal(isWin) {
       elements.displays.modalTitle.textContent = isWin ? "🎉 You Won! 🎉" : "⌛ Game Over ⌛";
       elements.displays.modalScore.textContent = `Score: ${state.score}`;
       elements.displays.modalMoves.textContent = `Moves: ${state.moves}`;
       elements.displays.modalTime.textContent = `Time Left: ${state.seconds <= 0 ? 0 : state.seconds}s`; // Show 0 if time ran out
 
-      displayLeaderboard(); // Populate leaderboard within modal
+      displayLeaderboard();
 
        elements.other.modal.classList.add('open');
-      elements.other.overlay.classList.add('active'); // Also show overlay with modal
+      elements.other.overlay.classList.add('active'); 
   }
 
-   // Added a global closeModal function for the simple 'x' button
    window.closeModal = () => {
       elements.other.modal.classList.remove('open');
       elements.other.overlay.classList.remove('active');
@@ -395,7 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function saveScoreToLeaderboard() {
       const entry = {
           score: state.score,
-          time: state.seconds > 0 ? state.seconds : 0, // Time remaining
+          time: state.seconds > 0 ? state.seconds : 0,
           moves: state.moves,
           difficulty: config.difficulties[state.currentDifficulty].name,
           timestamp: new Date().toISOString()
@@ -419,7 +416,6 @@ document.addEventListener('DOMContentLoaded', () => {
       leaderboardData.forEach((entry, index) => {
           const entryDiv = document.createElement('div');
           entryDiv.classList.add('entry');
-           // Highlight user score if implemented
           entryDiv.innerHTML = `
                <span>${index + 1}.</span> [${entry.difficulty}]
                Score: <span>${entry.score}</span> |
@@ -431,9 +427,7 @@ document.addEventListener('DOMContentLoaded', () => {
    }
 
 
-  // --- Event Listeners Setup ---
   function setupEventListeners() {
-      // Difficulty Selection
       elements.buttons.difficulty.forEach(button => {
           button.addEventListener('click', () => {
               state.currentDifficulty = button.dataset.difficulty;
@@ -441,30 +435,25 @@ document.addEventListener('DOMContentLoaded', () => {
           });
       });
 
-      // In-Game Buttons
       elements.buttons.restart.addEventListener('click', setupGame); // Restarts current difficulty
       elements.buttons.menu.addEventListener('click', () => switchView('difficulty')); // Go back to difficulty screen
 
-      // Audio Toggle
       elements.buttons.toggleAudio.addEventListener('click', toggleBackgroundMusic);
 
-      // Settings Panel
       elements.buttons.settings.addEventListener('click', openSettingsPanel);
       elements.buttons.closeSettings.addEventListener('click', closeSettingsPanel);
       elements.inputs.musicSelect.addEventListener('change', handleMusicSelection);
       elements.inputs.cardBackSelect.addEventListener('change', handleCardBackSelection);
 
-      // Modal Buttons
       elements.buttons.modalRestart.addEventListener('click', () => {
           closeModal();
-          setupGame(); // Restarts current difficulty
+          setupGame();
       });
       elements.buttons.modalMenu.addEventListener('click', () => {
           closeModal();
           switchView('difficulty');
       });
 
-       // Close modal/settings with Escape key
       document.addEventListener('keydown', (e) => {
           if (e.key === "Escape") {
               if (elements.other.settingsPanel.classList.contains('open')) {
@@ -476,9 +465,8 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
-  // --- Initialization ---
-  loadSettings(); // Load saved preferences first
+  loadSettings(); 
   setupEventListeners();
-  switchView('difficulty'); // Start at the difficulty selection screen
+  switchView('difficulty');
 
-}); // End DOMContentLoaded
+}); 
