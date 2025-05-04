@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // --- DOM Elements ---
   const elements = {
       views: {
           difficulty: document.getElementById('view-difficulty'),
@@ -46,9 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   };
 
-  // --- Game State ---
   let state = {
-      cards: [], // Array of card elements
+      cards: [],
       firstCard: null,
       secondCard: null,
       lockBoard: false,
@@ -57,25 +55,23 @@ document.addEventListener('DOMContentLoaded', () => {
       moves: 0,
       timerInterval: null,
       seconds: 0,
-      currentDifficulty: null, // 'easy', 'medium', 'hard'
-      cardImages: [], // Images for the current game
+      currentDifficulty: null,
+      cardImages: [], 
       gameActive: false,
-      audioMuted: true, // Start muted by default
+      audioMuted: true, 
   };
 
-  // --- Game Configuration ---
   const config = {
       difficulties: {
           easy: { name: 'Easy', cols: 4, rows: 4, pairs: 8, time: 120, cardSize: 100 },
           medium: { name: 'Medium', cols: 5, rows: 4, pairs: 10, time: 90, cardSize: 85 },
           hard: { name: 'Hard', cols: 6, rows: 5, pairs: 15, time: 75, cardSize: 75 },
       },
-      baseImages: [ // Add paths to ALL your unique images (at least enough for 'hard')
+      baseImages: [ 
           'img/img1.jpg', 'img/img2.jpg', 'img/img3.jpg', 'img/img4.jpg',
           'img/img5.jpg', 'img/img6.jpg', 'img/img7.jpg', 'img/img8.jpg',
           'img/img9.jpg', 'img/img10.jpg', 'img/img11.jpg', 'img/img12.jpg',
-          'img/img13.jpg', 'img/img14.jpg', 'img/img15.jpg', // Minimum for Hard (15 pairs)
-          // Add more if you have them
+          'img/img13.jpg', 'img/img14.jpg', 'img/img15.jpg', 
           'img/img16.jpg', 'img/img17.jpg', 'img/img18.jpg',
       ],
       selectors: {
@@ -90,7 +86,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   };
 
-  // --- Core Functions ---
 
   function switchView(viewToShow) {
       Object.values(elements.views).forEach(view => view.classList.remove('active'));
@@ -234,9 +229,9 @@ document.addEventListener('DOMContentLoaded', () => {
                if (state.matches === state.cardImages.length / 2) {
                   endGame(true); // Game Won
               } else {
-                  resetTurn(); // Reset for next turn
+                  resetTurn(); 
               }
-          }, 500); // Shorter delay after match sound
+          }, 500); 
       } else {
           setTimeout(unflipCards, 1000);
       }
