@@ -338,8 +338,6 @@ document.addEventListener('DOMContentLoaded', () => {
    function openSettingsPanel() {
       elements.other.overlay.classList.add('active');
        elements.other.settingsPanel.classList.add('open');
-      // Add listener to close when clicking overlay
-      // Use setTimeout to avoid instant closing if the setting button triggered it
        setTimeout(() => {
            elements.other.overlay.addEventListener('click', closeSettingsPanel, { once: true });
       }, 0);
@@ -348,7 +346,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function closeSettingsPanel() {
        elements.other.settingsPanel.classList.remove('open');
       elements.other.overlay.classList.remove('active');
-      // Remove overlay listener if it wasn't triggered
       elements.other.overlay.removeEventListener('click', closeSettingsPanel);
   }
 
