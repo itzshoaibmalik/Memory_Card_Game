@@ -238,7 +238,6 @@ document.addEventListener('DOMContentLoaded', () => {
               }
           }, 500); // Shorter delay after match sound
       } else {
-          // Mismatch - delay before flipping back
           setTimeout(unflipCards, 1000);
       }
   }
