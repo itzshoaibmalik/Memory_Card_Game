@@ -16,10 +16,11 @@
     </video>
     <div id="particles-js"></div>
 
+    <!-- Audio Elements -->
     <audio id="clickSound" src="music/sound1.mp3" preload="auto"></audio>
-    <audio id="matchSound" src="music/match.mp3" preload="auto"></audio> <!-- Add this sound -->
-    <audio id="winSound" src="music/win.mp3" preload="auto"></audio> <!-- Add this sound -->
-    <audio id="backgroundAudio" loop preload="auto"></audio> <!-- Src set by JS -->
+    <audio id="matchSound" src="music/match.mp3" preload="auto"></audio>
+    <audio id="winSound" src="music/win.mp3" preload="auto"></audio>
+    <audio id="backgroundAudio" loop preload="auto"></audio>
 
     <div class="container">
         <header class="game-header">
@@ -28,15 +29,35 @@
             <button id="settingsButton" title="Settings">⚙️</button>
         </header>
 
-        <div id="view-difficulty" class="view active">
-            <h2>Choose Difficulty</h2>
-            <div class="difficulty-buttons">
-                <button data-difficulty="easy">Easy (4x4)</button>
-                <button data-difficulty="medium">Medium (5x4)</button>
-                <button data-difficulty="hard">Hard (6x5)</button>
+        <div id="view-difficulty" class="view active"> 
+            <h2 class="difficulty-title"><span>SELECT</span> YOUR <span>CHALLENGE</span></h2>
+            <div class="difficulty-options-container">
+                <div class="difficulty-card" data-difficulty="easy">
+                    <div class="card-content">
+                        <h3>Easy</h3>
+                        <p class="difficulty-details">4 x 4 Grid</p>
+                        <span class="difficulty-icon">🌿</span>
+                        <button class="select-btn">Select</button>
+                    </div>
+                </div>
+                <div class="difficulty-card" data-difficulty="medium">
+                    <div class="card-content">
+                        <h3>Medium</h3>
+                        <p class="difficulty-details">5 x 4 Grid</p>
+                        <span class="difficulty-icon">⚔️</span>
+                        <button class="select-btn">Select</button>
+                    </div>
+                </div>
+                <div class="difficulty-card" data-difficulty="hard">
+                    <div class="card-content">
+                        <h3>Hard</h3>
+                        <p class="difficulty-details">6 x 5 Grid</p>
+                        <span class="difficulty-icon">🔥</span>
+                        <button class="select-btn">Select</button>
+                    </div>
+                </div>
             </div>
         </div>
-
 
         <div id="view-game" class="view">
             <div class="status-bar">
@@ -73,9 +94,16 @@
                 <label for="cardBackSelect">Card Back:</label>
                 <select id="cardBackSelect">
                     <option value="img/imagebg.jpg">Default Pattern</option>
+                    <!-- Add other options if you create cardback images -->
+                    <!-- <option value="img/cardback_blue.jpg">Abstract Blue</option> -->
+                </select>
+            </div>
 
-
-
+            <div class="settings-section">
+                <label for="themeSelect">Theme:</label>
+                <select id="themeSelect">
+                    <option value="theme-default">Neon Abyss</option> 
+                    <option value="theme-sunset">Sunset</option>
                 </select>
             </div>
 
@@ -86,11 +114,12 @@
                 <button class="btn-secondary" onclick="window.location.href='signup.html'">Sign Up</button>
             </div>
         </aside>
-        <div class="overlay" id="overlay"></div> <!-- For dimming background -->
+
+        <div class="overlay" id="overlay"></div>
 
         <div id="gameOverModal" class="modal">
             <div class="modal-content">
-                <button class="close-modal-btn" onclick="closeModal()">×</button> <!-- Simple close -->
+                <button class="close-modal-btn" onclick="closeModal()">×</button>
                 <h2 id="modalTitle">Game Over!</h2>
                 <div class="modal-stats">
                     <p id="modalScore">Score: 0</p>
@@ -110,17 +139,9 @@
             </div>
         </div>
     </div>
-    <div id="particles-js"></div>
 
-    <script src="path/to/particles.min.js"></script>
-    <script>
-        particlesJS.load('particles-js', 'assets/particles-config.json', function () {
-            console.log('Particles.js config loaded');
-        });
-    </script>
-
-    <script src="script.js"></script>
     <script src="js/particles.min.js"></script>
+    <script src="script.js"></script>
 
 </body>
 
