@@ -653,20 +653,256 @@ document.addEventListener('DOMContentLoaded', () => {
          loadSettings(); // Load saved preferences first
          setupEventListeners(); // Attach listeners
 
-        // Initialize Particles.js only if the library is loaded and container exists
-        if (typeof particlesJS !== 'undefined' && elements.other.particlesContainer) {
-             // Make sure the path to your config is correct relative to index.html
-             particlesJS.load('particles-js', 'assets/particles-config.json', function() {
-                 console.log('Particles.js config loaded successfully.'); // Debug
-             });
-        } else if (!elements.other.particlesContainer) {
-            console.warn("Particles container (#particles-js) not found in HTML.");
-        } else {
-             console.warn("particles.js library not loaded or available.");
+        // Initialize particles
+        if (typeof particlesJS !== 'undefined') {
+            particlesJS('particles-js', {
+                particles: {
+                    number: { value: 80, density: { enable: true, value_area: 800 } },
+                    color: { value: '#ffffff' },
+                    shape: { type: 'circle' },
+                    opacity: { value: 0.5, random: false },
+                    size: { value: 3, random: true },
+                    line_linked: {
+                        enable: true,
+                        distance: 150,
+                        color: '#ffffff',
+                        opacity: 0.4,
+                        width: 1
+                    },
+                    move: {
+                        enable: true,
+                        speed: 2,
+                        direction: 'none',
+                        random: false,
+                        straight: false,
+                        out_mode: 'out',
+                        bounce: false
+                    }
+                },
+                interactivity: {
+                    detect_on: 'canvas',
+                    events: {
+                        onhover: { enable: true, mode: 'repulse' },
+                        onclick: { enable: true, mode: 'push' },
+                        resize: true
+                    }
+                },
+                retina_detect: true
+            });
         }
 
-         switchView('difficulty'); // Show initial view
+        // Add new game features
+        addPowerUps();
+        addAchievements();
+        setupEventListeners();
+        loadSettings();
+        switchView('difficulty');
          console.log("App Initialized."); // Debug
+    }
+
+    // Power-ups system
+    function addPowerUps() {
+        const powerUps = {
+            reveal: {
+                name: 'Reveal',
+                icon: '👁️',
+                description: 'Reveal all cards for 3 seconds',
+                cooldown: 60,
+                lastUsed: 0
+            },
+            shuffle: {
+                name: 'Shuffle',
+                icon: '🔄',
+                description: 'Shuffle unmatched cards',
+                cooldown: 45,
+                lastUsed: 0
+            },
+            timeFreeze: {
+                name: 'Time Freeze',
+                icon: '⏸️',
+                description: 'Freeze timer for 10 seconds',
+                cooldown: 90,
+                lastUsed: 0
+            }
+        };
+
+        // Add power-ups UI
+        const powerUpsContainer = document.createElement('div');
+        powerUpsContainer.className = 'power-ups-container';
+        powerUpsContainer.innerHTML = `
+            <h3>Power-ups</h3>
+            <div class="power-ups-grid">
+                ${Object.entries(powerUps).map(([key, powerUp]) => `
+                    <button class="power-up-btn" data-power="${key}" title="${powerUp.description}">
+                        ${powerUp.icon}
+                        <span class="cooldown"></span>
+                    </button>
+                `).join('')}
+            </div>
+        `;
+        elements.containers.game.parentElement.insertBefore(powerUpsContainer, elements.containers.game);
+
+        // Power-up handlers
+        document.querySelectorAll('.power-up-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const powerUp = powerUps[btn.dataset.power];
+                const now = Date.now();
+                if (now - powerUp.lastUsed < powerUp.cooldown * 1000) {
+                    showNotification(`Power-up on cooldown! Wait ${Math.ceil((powerUp.cooldown * 1000 - (now - powerUp.lastUsed)) / 1000)}s`);
+                    return;
+                }
+
+                switch(btn.dataset.power) {
+                    case 'reveal':
+                        revealAllCards();
+                        break;
+                    case 'shuffle':
+                        shuffleUnmatchedCards();
+                        break;
+                    case 'timeFreeze':
+                        freezeTimer();
+                        break;
+                }
+                powerUp.lastUsed = now;
+                updatePowerUpCooldowns();
+            });
+        });
+    }
+
+    // Achievements system
+    function addAchievements() {
+        const achievements = {
+            speedster: {
+                name: 'Speedster',
+                description: 'Complete a game in under 60 seconds',
+                icon: '⚡',
+                unlocked: false
+            },
+            perfect: {
+                name: 'Perfect Match',
+                description: 'Complete a game with no mismatches',
+                icon: '🌟',
+                unlocked: false
+            },
+            master: {
+                name: 'Memory Master',
+                description: 'Win 5 games in a row',
+                icon: '👑',
+                unlocked: false
+            }
+        };
+
+        // Store achievements in localStorage
+        if (!localStorage.getItem('achievements')) {
+            localStorage.setItem('achievements', JSON.stringify(achievements));
+        }
+
+        // Check achievements on game end
+        const originalEndGame = endGame;
+        endGame = function(isWin) {
+            originalEndGame(isWin);
+            if (isWin) {
+                checkAchievements();
+            }
+        };
+    }
+
+    // Helper functions for new features
+    function revealAllCards() {
+        const cards = Array.from(state.cards);
+        cards.forEach(card => card.classList.add('flipped'));
+        setTimeout(() => {
+            cards.forEach(card => {
+                if (!card.classList.contains('matched')) {
+                    card.classList.remove('flipped');
+                }
+            });
+        }, 3000);
+    }
+
+    function shuffleUnmatchedCards() {
+        const unmatchedCards = Array.from(state.cards).filter(card => !card.classList.contains('matched'));
+        const cardImages = unmatchedCards.map(card => card.dataset.image);
+        shuffleArray(cardImages);
+        unmatchedCards.forEach((card, index) => {
+            card.dataset.image = cardImages[index];
+            card.querySelector('.card-back img').src = cardImages[index];
+        });
+    }
+
+    function freezeTimer() {
+        const originalSeconds = state.seconds;
+        clearInterval(state.timerInterval);
+        setTimeout(() => {
+            state.seconds = originalSeconds;
+            startTimer();
+        }, 10000);
+    }
+
+    function updatePowerUpCooldowns() {
+        document.querySelectorAll('.power-up-btn').forEach(btn => {
+            const powerUp = powerUps[btn.dataset.power];
+            const now = Date.now();
+            const timeLeft = Math.ceil((powerUp.cooldown * 1000 - (now - powerUp.lastUsed)) / 1000);
+            const cooldownEl = btn.querySelector('.cooldown');
+            if (timeLeft > 0) {
+                cooldownEl.textContent = timeLeft;
+                btn.disabled = true;
+            } else {
+                cooldownEl.textContent = '';
+                btn.disabled = false;
+            }
+        });
+    }
+
+    function showNotification(message) {
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 3000);
+    }
+
+    function checkAchievements() {
+        const achievements = JSON.parse(localStorage.getItem('achievements'));
+        
+        // Check Speedster achievement
+        if (state.seconds > 0 && !achievements.speedster.unlocked) {
+            achievements.speedster.unlocked = true;
+            showAchievementUnlocked('Speedster');
+        }
+
+        // Check Perfect Match achievement
+        if (state.moves === state.matches * 2 && !achievements.perfect.unlocked) {
+            achievements.perfect.unlocked = true;
+            showAchievementUnlocked('Perfect Match');
+        }
+
+        // Check Memory Master achievement
+        const winStreak = parseInt(localStorage.getItem('winStreak') || '0') + 1;
+        localStorage.setItem('winStreak', winStreak);
+        if (winStreak >= 5 && !achievements.master.unlocked) {
+            achievements.master.unlocked = true;
+            showAchievementUnlocked('Memory Master');
+        }
+
+        localStorage.setItem('achievements', JSON.stringify(achievements));
+    }
+
+    function showAchievementUnlocked(achievementName) {
+        const achievement = document.createElement('div');
+        achievement.className = 'achievement-unlocked';
+        achievement.innerHTML = `
+            <div class="achievement-content">
+                <span class="achievement-icon">🏆</span>
+                <div class="achievement-text">
+                    <h4>Achievement Unlocked!</h4>
+                    <p>${achievementName}</p>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(achievement);
+        setTimeout(() => achievement.remove(), 5000);
     }
 
     initApp(); // Start the application
