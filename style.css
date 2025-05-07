@@ -901,19 +901,35 @@ body.theme-sunset {
   #leaderboard .entry { font-size: 0.9rem; padding: 0.5rem 0.8rem;}
 }
 
+/* Game Wrapper */
+.game-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    gap: 15px;
+    margin: 0 auto;
+}
+
 /* Power-ups Styles */
 .power-ups-container {
-    background: rgba(0, 0, 0, 0.8);
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 20px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 8px;
+    padding: 10px;
+    width: 100%;
+    max-width: 400px;
     text-align: center;
+    backdrop-filter: blur(5px);
+    border: 1px solid var(--accent-color-alpha-30);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .power-ups-container h3 {
-    color: #fff;
+    color: var(--accent-color);
     margin-bottom: 10px;
-    font-size: 1.2em;
+    font-size: 1.1em;
+    text-shadow: 0 0 10px var(--shadow-color-main);
 }
 
 .power-ups-grid {
@@ -923,26 +939,28 @@ body.theme-sunset {
 }
 
 .power-up-btn {
-    background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+    background: linear-gradient(45deg, var(--accent-color), var(--secondary-accent));
     border: none;
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    font-size: 1.5em;
+    width: 45px;
+    height: 45px;
+    font-size: 1.3em;
     cursor: pointer;
     position: relative;
     transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .power-up-btn:hover {
     transform: scale(1.1);
-    box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
+    box-shadow: 0 0 15px var(--shadow-color-main);
 }
 
 .power-up-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
+    background: linear-gradient(45deg, #666, #999);
 }
 
 .power-up-btn .cooldown {
@@ -955,6 +973,7 @@ body.theme-sunset {
     padding: 2px 6px;
     border-radius: 10px;
     font-size: 0.8em;
+    min-width: 20px;
 }
 
 /* Notification Styles */

@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentDifficulty: null,
         cardImages: [],
         gameActive: false,
-        audioMuted: true, // Default to muted
+        audioMuted: false, // Changed to false by default
     };
 
     // --- Game Configuration ---
@@ -353,71 +353,71 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function toggleBackgroundMusic() {
-         state.audioMuted = !state.audioMuted;
+        state.audioMuted = !state.audioMuted;
         elements.buttons.toggleAudio.textContent = state.audioMuted ? '🔇' : '🔊';
-        console.log("Mute toggled. New state: ", state.audioMuted); // DEBUG
+        console.log("Mute toggled. New state: ", state.audioMuted);
 
-         if (state.audioMuted) {
+        if (state.audioMuted) {
             elements.audio.background.pause();
-         } else {
-             // Play ONLY if a valid track is selected in dropdown AND src is set
-             const selectedMusic = elements.inputs.musicSelect.value;
-            if (selectedMusic && selectedMusic !== 'disabled' && elements.audio.background.src) {
-                 // Make sure it's loaded before playing if src was just set
-                if (elements.audio.background.readyState >= 2) {
-                    playSound(elements.audio.background); // Will check mute state internally now
-                     console.log("Attempting to play on unmute: ", elements.audio.background.src); // DEBUG
-                } else {
-                     console.log("Waiting for audio to load before playing..."); // Debug
-                     elements.audio.background.addEventListener('canplaythrough', () => playSound(elements.audio.background), { once: true });
-                }
-             } else {
-                console.log("Not playing on unmute. Selection:", selectedMusic, " Src:", elements.audio.background.src); //DEBUG
-             }
-         }
+        } else {
+            const selectedMusic = elements.inputs.musicSelect.value;
+            if (selectedMusic && selectedMusic !== 'disabled') {
+                // Create a new audio element to test the URL
+                const testAudio = new Audio();
+                testAudio.addEventListener('canplaythrough', () => {
+                    // If we can play through, set the actual audio source
+                    elements.audio.background.src = selectedMusic;
+                    elements.audio.background.load();
+                    elements.audio.background.play().catch(error => {
+                        console.error("Error playing audio:", error);
+                        showNotification("Could not play music. Please try a different track.");
+                    });
+                }, { once: true });
+
+                testAudio.addEventListener('error', (e) => {
+                    console.error("Error loading audio:", e);
+                    showNotification("Could not load music. Please try a different track.");
+                }, { once: true });
+
+                // Start loading the test audio
+                testAudio.src = selectedMusic;
+                testAudio.load();
+            }
+        }
     }
 
     function handleMusicSelection() {
-         const selectedMusic = elements.inputs.musicSelect.value;
-         localStorage.setItem(config.storageKeys.music, selectedMusic);
-        console.log("Music selected:", selectedMusic); // DEBUG
-
-         // Determine current source WITHOUT full path for comparison if needed
-        let currentSrc = '';
-         try { currentSrc = new URL(elements.audio.background.src).pathname; } catch (e) { /* ignore if src invalid */}
-        const selectedSrcPath = selectedMusic ? `/${selectedMusic}` : ''; // Match format '/path/to/music.mp3'
+        const selectedMusic = elements.inputs.musicSelect.value;
+        localStorage.setItem(config.storageKeys.music, selectedMusic);
+        console.log("Music selected:", selectedMusic);
 
         if (selectedMusic && selectedMusic !== 'disabled') {
-             // Only change src if it's actually different or not set
-            if (!elements.audio.background.src || !currentSrc.endsWith(selectedSrcPath)) {
+            // Create a new audio element to test the URL
+            const testAudio = new Audio();
+            testAudio.addEventListener('canplaythrough', () => {
+                // If we can play through, set the actual audio source
                 elements.audio.background.src = selectedMusic;
-                console.log("Set background src to:", selectedMusic); // DEBUG
-                elements.audio.background.load(); // Load the new source
+                elements.audio.background.load();
+                
+                if (!state.audioMuted) {
+                    elements.audio.background.play().catch(error => {
+                        console.error("Error playing audio:", error);
+                        showNotification("Could not play music. Please try a different track.");
+                    });
+                }
+            }, { once: true });
 
-                elements.audio.background.addEventListener('loadeddata', () => {
-                    console.log("Audio loaded:", selectedMusic); // Debug
-                    playSound(elements.audio.background); // Attempt play after loading (checks mute)
-                 }, { once: true });
-                elements.audio.background.addEventListener('error', (e) => {
-                     console.error("Error loading audio source:", selectedMusic, e); // More detailed error
-                     alert(`Error: Could not load music file: ${selectedMusic}. Please check the file path and format.`);
-                 }, { once: true });
-            } else if (!state.audioMuted && elements.audio.background.paused) {
-                 // If same track was paused, play it
-                playSound(elements.audio.background);
-                console.log("Playing existing paused track."); //DEBUG
-            } else if (state.audioMuted){
-                console.log("Music selected but muted."); // DEBUG
-             }
+            testAudio.addEventListener('error', (e) => {
+                console.error("Error loading audio:", e);
+                showNotification("Could not load music. Please try a different track.");
+            }, { once: true });
+
+            // Start loading the test audio
+            testAudio.src = selectedMusic;
+            testAudio.load();
         } else {
-             // "No Music" or "-- Select --" selected
-             elements.audio.background.pause();
-             elements.audio.background.removeAttribute('src');
-            console.log("Music paused and src removed."); // DEBUG
-             if (elements.buttons.toggleAudio.textContent === '🔊') {
-                 elements.buttons.toggleAudio.textContent = '🔇';
-                 state.audioMuted = true;
-             }
+            elements.audio.background.pause();
+            elements.audio.background.removeAttribute('src');
         }
     }
 
@@ -726,6 +726,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
+        // Create a wrapper for power-ups and game container
+        const gameWrapper = document.createElement('div');
+        gameWrapper.className = 'game-wrapper';
+        
         // Add power-ups UI
         const powerUpsContainer = document.createElement('div');
         powerUpsContainer.className = 'power-ups-container';
@@ -740,7 +744,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 `).join('')}
             </div>
         `;
-        elements.containers.game.parentElement.insertBefore(powerUpsContainer, elements.containers.game);
+
+        // Get the game container's parent
+        const gameContainerParent = elements.containers.game.parentElement;
+        
+        // Replace the game container with our new wrapper
+        gameContainerParent.replaceChild(gameWrapper, elements.containers.game);
+        
+        // Add power-ups and game container to the wrapper
+        gameWrapper.appendChild(powerUpsContainer);
+        gameWrapper.appendChild(elements.containers.game);
 
         // Power-up handlers
         document.querySelectorAll('.power-up-btn').forEach(btn => {
